@@ -404,6 +404,11 @@ void ImGui_ImplGlfw_WindowFocusCallback(GLFWwindow* window, int focused)
 
 void ImGui_ImplGlfw_CursorPosCallback(GLFWwindow* window, double x, double y)
 {
+#ifdef __EMSCRIPTEN__
+    double pixel_ratio = emscripten_get_device_pixel_ratio(); 
+    x *= pixel_ratio;
+    y *= pixel_ratio;
+#endif
     ImGui_ImplGlfw_Data* bd = ImGui_ImplGlfw_GetBackendData();
     if (bd->PrevUserCallbackCursorPos != nullptr && ImGui_ImplGlfw_ShouldChainCallback(window))
         bd->PrevUserCallbackCursorPos(window, x, y);
@@ -815,6 +820,9 @@ static EM_BOOL ImGui_ImplGlfw_OnCanvasSizeChange(int event_type, const Emscripte
     ImGui_ImplGlfw_Data* bd = (ImGui_ImplGlfw_Data*)user_data;
     double canvas_width, canvas_height;
     emscripten_get_element_css_size(bd->CanvasSelector, &canvas_width, &canvas_height);
+    double pixel_ratio = emscripten_get_device_pixel_ratio();
+    canvas_width *= pixel_ratio;
+    canvas_height *= pixel_ratio;
     glfwSetWindowSize(bd->Window, (int)canvas_width, (int)canvas_height);
     return true;
 }
@@ -824,6 +832,9 @@ static EM_BOOL ImGui_ImplEmscripten_FullscreenChangeCallback(int event_type, con
     ImGui_ImplGlfw_Data* bd = (ImGui_ImplGlfw_Data*)user_data;
     double canvas_width, canvas_height;
     emscripten_get_element_css_size(bd->CanvasSelector, &canvas_width, &canvas_height);
+    double pixel_ratio = emscripten_get_device_pixel_ratio();
+    canvas_width *= pixel_ratio;
+    canvas_height *= pixel_ratio;
     glfwSetWindowSize(bd->Window, (int)canvas_width, (int)canvas_height);
     return true;
 }
